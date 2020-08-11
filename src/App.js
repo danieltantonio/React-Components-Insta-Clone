@@ -5,7 +5,7 @@ Look at each file to see what props need to be passed.
 */
 
 // Import the state hook
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // Import the Posts (plural!) and SearchBar components, since they are used inside App component
 import Posts from './components/Posts/Posts';
 import SearchBar from './components/SearchBar/SearchBar';
@@ -18,6 +18,7 @@ const App = () => {
   // To make the search bar work (which is stretch) we'd need another state to hold the search term.
   const [posts, setPosts] = useState(data);
   const [search, setSearch] = useState('');
+
   const likePost = postId => {
     // This function is passed into nested components using props, to allow them to update application state.
     // It takes a post id as its only argument. The idea is to increase the 'likes' count of the post with the given `id`.
@@ -34,12 +35,29 @@ const App = () => {
     }))
   };
 
+  const handleSearch = (value) => {
+    setSearch(value)
+  }
+
+  useEffect(() => {
+    if(!search) {
+      setPosts(data);
+    }
+
+    data.filter(post => {
+      if(post.username === search) {
+        setPosts(post)
+      }
+    })
+  }, [search])
+  
+
   return (
     <div className="App">
       {/* Add SearchBar and Posts here to render them */}
-      <SearchBar />
+      <SearchBar search={search} handleSearch={handleSearch} />
       {/* Check the implementation of each component, to see what props they require, if any! */}
-      <Posts posts={posts} likePost={likePost} />
+      <Posts posts={posts} likePost={likePost} search={search}/>
     </div>
   );
 };
